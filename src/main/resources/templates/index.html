@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+<form id="my_form" method="post" action="/user/logout">
+<div id="id-wrap" th:if="${loginStatus}">
+    안녕하세요!
+    <span id="user-id"  th:text="${username}"></span>님
+</div>
+
+<button id="login-text" th:if="!${loginStatus}" type="button"  onclick="location.href='/user/login'" class="btn btn-outline-warning">
+    로그인
+</button>
+
+<button id="logout-text" th:if="${loginStatus}" onclick="document.getElementById('my_form').submit();" class="btn btn-outline-warning">
+    로그아웃
+</button>
+</form>
+
+</body>
+</html>
