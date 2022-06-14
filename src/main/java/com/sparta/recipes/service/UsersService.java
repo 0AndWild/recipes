@@ -2,6 +2,7 @@ package com.sparta.recipes.service;
 
 import com.sparta.recipes.domain.UserRoleEnum;
 import com.sparta.recipes.domain.Users;
+import com.sparta.recipes.dto.LoginRequestDto;
 import com.sparta.recipes.dto.SignupRequestDto;
 import com.sparta.recipes.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +28,12 @@ public class UsersService {
 
     /*회원가입*/
     /*관리자 체크 메서드는 아직 구현x */
-    public void registerUser(SignupRequestDto requestDto) {
+    public boolean registerUser(SignupRequestDto requestDto) {
 
         String username = requestDto.getUsername();
-        /*아이디 중복검사메서드*/
-        idDuplicationTest(username);
+        /*입력한 username이 DB에 동일하게 저장되어 있는지 확인(중복검사)*/
+        Optional<Users> find = usersRepository.findByUsername(username);
+
         /*패스워드 복호화*/
         /*사용자가 입력한 비밀번호 requestDto.getPassword() 가 passwordEncoder.encode 에 의해 암호화됨.*/
         String password = passwordEncoder.encode(requestDto.getPassword());
@@ -40,17 +42,25 @@ public class UsersService {
 
         Users user = new Users(username, password, email, userRole);
 
-        usersRepository.save(user);
+        /*아이디 중복검사메서드*/
+
+        if (find.isPresent()){
+            return false;
+        } else {
+            usersRepository.save(user);
+            return true;
+        }
+
     }
 
-    /*아이디 중복검사메서드*/
-    private void idDuplicationTest(String username) {
-        Optional<Users> find = usersRepository.findByUsername(username);
-        /*Id 중복검사*/
-        if (find.isPresent()){
-            throw new IllegalArgumentException("중복된 사용자 ID가 존재합니다.");
-        }
-    }
+//    /*아이디 중복검사메서드*/
+//    private void idDuplicationTest(String username) {
+//        Optional<Users> find = usersRepository.findByUsername(username);
+//        /*Id 중복검사*/
+//        if (find.isPresent()){
+//            throw new IllegalArgumentException("중복된 사용자 ID가 존재합니다.");
+//        }
+//    }
 
 }
 
