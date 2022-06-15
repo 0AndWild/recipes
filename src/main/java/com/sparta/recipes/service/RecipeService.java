@@ -4,7 +4,6 @@ import com.sparta.recipes.domain.Recipes;
 import com.sparta.recipes.dto.RecipeDto;
 import com.sparta.recipes.repository.RecipeRepository;
 import com.sparta.recipes.security.UserDetailsImpl;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -37,20 +36,33 @@ public class RecipeService {
 
     // 레시피 Update
     @Transactional
-    public void editRecipe(RecipeDto recipeDto, Long recipeId, String username) {
-        checkRecipeId(recipeId);
-//      checkUsername(recipeDto.getUsername());
+    public Long editRecipe(Long recipeId, RecipeDto recipeDto, UserDetailsImpl userDetails) {
+
+
         Recipes recipes = recipeRepository.findByRecipeId(recipeId);
-        editRecipeVal(recipeDto);
-        recipes.updateRecipe(recipeDto, username);
+        String checkName = recipes.getUsername();
+        String username = userDetails.getUser().getUsername();
+        if (checkName.equals(username)){
+            recipes.updateRecipe(recipeDto);
+            return 1L;
+        } else {
+            return 0L;
+        }
+
     }
 
     // 레시피 Delete
     @Transactional
-    public void deleteRecipe(Long recipeId, String username) {
-        checkRecipeId(recipeId);
-//      checkUsername(username);
-        recipeRepository.deleteById(recipeId);
+    public Boolean deleteRecipe(Long recipeId, UserDetailsImpl userDetails) {
+        Recipes recipes = recipeRepository.findByRecipeId(recipeId);
+        String checkName = recipes.getUsername();
+        String username = userDetails.getUser().getUsername();
+
+        if(checkName.equals(username)){
+            recipeRepository.deleteById(recipeId);
+            return true;
+        } return false;
+
     }
 
 
@@ -61,23 +73,4 @@ public class RecipeService {
         }
     }
 
-    // 레시피 수정 시 빈 칸은 수정 없는 칸으로
-    public void editRecipeVal(RecipeDto recipeDto){
-        if(recipeDto.getTitle().isEmpty()){
-            recipeDto.setTitle(recipeRepository.findByRecipeId(recipeDto.getRecipeId()).getTitle());
-        }
-        if(recipeDto.getImage().isEmpty()){
-            recipeDto.setImage(recipeRepository.findByRecipeId(recipeDto.getRecipeId()).getImage());
-        }
-        if(recipeDto.getContents().isEmpty()){
-            recipeDto.setContents(recipeRepository.findByRecipeId(recipeDto.getRecipeId()).getContents());
-        }
-    }
-
-    // 작성자 체크
-//    public void checkUsername(String username) {
-//        if (!username.equals(recipeDto.getUsername())) {
-//            throw new Exception("해당 작성자가 아님");
-//        }
-//    }
 }

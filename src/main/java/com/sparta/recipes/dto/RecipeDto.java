@@ -9,8 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RecipeDto {
 
-    private Long recipeId;
-    private String username;
+//    private Long recipeId;
+//    private String username;
     private String contents;
     private String title;
     private String image;

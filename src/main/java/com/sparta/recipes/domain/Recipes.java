@@ -23,7 +23,7 @@ public class Recipes {
     @Column(nullable = false)
     private String contents;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 8000)
     private String image;
 
     @Column(nullable = false)
@@ -42,11 +42,10 @@ public class Recipes {
         this.username = username;
     }
 
-    public void updateRecipe(RecipeDto recipeDto, String username) {
+    public void updateRecipe(RecipeDto recipeDto) {
         this.title = recipeDto.getTitle();
         this.contents = recipeDto.getContents();
         this.image = recipeDto.getImage();
-        this.username = username;
     }
 
 
