@@ -18,28 +18,35 @@ public class Recipes {
     private Long recipeId;
 
     @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private String contents;
+
+    @Column(nullable = false)
+    private String image;
+
+    @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false)
-    private String recipeTitle;
-
-    @Column(nullable = false)
-    private String recipeContent;
-
-    @Column(nullable = false)
-    private String recipeImgUrl;
-
     public Recipes(RecipeDto recipeDto) {
-        this.username = recipeDto.getUsername();
-        this.recipeTitle = recipeDto.getRecipeTitle();
-        this.recipeContent = recipeDto.getRecipeContent();
-        this.recipeImgUrl =  recipeDto.getRecipeImgUrl();
+        this.title = recipeDto.getTitle();
+        this.contents = recipeDto.getContents();
+        this.image =  recipeDto.getImage();
     }
 
-    public void updateRecipe(RecipeDto recipeDto) {
-        this.recipeTitle = recipeDto.getRecipeTitle();
-        this.recipeContent = recipeDto.getRecipeContent();
-        this.recipeImgUrl = recipeDto.getRecipeImgUrl();
+    public Recipes(RecipeDto recipeDto, String username){
+        this.title = recipeDto.getTitle();
+        this.contents = recipeDto.getContents();
+        this.image = recipeDto.getImage();
+        this.username = username;
+    }
+
+    public void updateRecipe(RecipeDto recipeDto, String username) {
+        this.title = recipeDto.getTitle();
+        this.contents = recipeDto.getContents();
+        this.image = recipeDto.getImage();
+        this.username = username;
     }
 
 

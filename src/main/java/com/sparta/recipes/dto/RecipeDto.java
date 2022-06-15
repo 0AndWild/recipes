@@ -11,8 +11,8 @@ public class RecipeDto {
 
     private Long recipeId;
     private String username;
-    private String recipeContent;
-    private String recipeTitle;
-    private String recipeImgUrl;
+    private String contents;
+    private String title;
+    private String image;
 
 }

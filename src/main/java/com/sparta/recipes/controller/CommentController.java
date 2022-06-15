@@ -1,6 +1,12 @@
 package com.sparta.recipes.controller;
 
+import com.sparta.recipes.domain.Comments;
+import com.sparta.recipes.dto.CommentDto;
+import com.sparta.recipes.repository.CommentRepository;
+import com.sparta.recipes.service.CommentService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class CommentController {
@@ -27,22 +33,24 @@ public class CommentController {
 
     // 댓글 작성
     @PostMapping("/api/comments")
-    public void createComment(@RequestBody CommentDto commentDto) {
-        commentService.createComment(commentDto);
+    public Long createComment(@RequestBody CommentDto commentDto) {
+        return commentService.createComment(commentDto);
     }
 
     // 댓글 수정
     // controller 에서 사용자, 작성자 대조하는 경우
     @PutMapping("/api/comments/{commentId}")
-    public void editComment(/*@AuthenticationPrincipal userDetail, */@PathVariable Long commentId, @RequestBody CommentDto commentDto){
+    public Long editComment(/*@AuthenticationPrincipal userDetail, */@PathVariable Long commentId, @RequestBody CommentDto commentDto){
 //        checkUsername(userDetail.getUsername(), commentDto.getUsername());
         commentService.editComment(commentDto,commentId);
+        return commentDto.getCommentId();
     }
 
     // 댓글 삭제
     @DeleteMapping("/api/comments/{commentId}")
-    public void deleteComment(@PathVariable Long commentId, @RequestBody CommentDto commentDto){
+    public Long deleteComment(@PathVariable Long commentId, @RequestBody CommentDto commentDto){
         commentService.deleteComment(commentDto, commentId);
+        return commentId;
     }
 
     // 작성자 체크

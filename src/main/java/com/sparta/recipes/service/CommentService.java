@@ -7,6 +7,7 @@ import com.sparta.recipes.repository.RecipeRepository;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class CommentService {
@@ -27,10 +28,12 @@ public class CommentService {
 
     // 댓글 작성
     @Transactional
-    public void createComment(CommentDto commentDto) {
+    public Long createComment(CommentDto commentDto) {
         checkRecipeId(commentDto.getRecipeId());
         Comments comments = new Comments(commentDto);
         commentRepository.save(comments);
+        List<Comments> tempList = commentRepository.findAllByOrderByCommentIdAsc();
+        return tempList.get(tempList.size()-1).getCommentId();
     }
 
     // 댓글 수정

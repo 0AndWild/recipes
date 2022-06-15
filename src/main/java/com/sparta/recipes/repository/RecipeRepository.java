@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipes, Long> {
 
-    List<Recipes> findAllByOrderByRecipeIdDesc();
+    List<Recipes> findAllByOrderByRecipeIdAsc();
 
     Recipes findByRecipeId(Long recipeId);
 }
