@@ -80,6 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 // 로그인 처리 (POST /user/login)
                 http.logout()
                         .logoutUrl("/user/logout")
+//                        .deleteCookies("JSESSIONID")
                         .logoutSuccessHandler(restLogoutSuccessHandler)
                         .permitAll();
                 http.exceptionHandling();
