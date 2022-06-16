@@ -16,6 +16,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.session.web.http.CookieSerializer;
+import org.springframework.session.web.http.DefaultCookieSerializer;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
@@ -25,6 +27,17 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity // 스프링 Security 지원을 가능하게 함
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Bean
+    public CookieSerializer cookieSerializer() {
+        DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+        serializer.setUseSecureCookie(true);
+        serializer.setCookieName("TOUGHCOOKIE");
+        serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$");
+        serializer.setSameSite("None");
+        return serializer;
+    }
+
 
     @Bean
     public BCryptPasswordEncoder encodePassword() {
@@ -47,6 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
 
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 // 회원 관리 처리 API (POST /user/**) 에 대해 CSRF 무시
@@ -64,11 +78,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .mvcMatchers("/css/**","/scripts/**","/images/**").permitAll() //resources 파일 예외처리
 
                  /*회원 관리 처리 API 전부를 login 없이 허용*/
-                .antMatchers("/user/register/**").permitAll()
+//                .antMatchers("/user/register/**").permitAll()
                 .antMatchers("/user/**").permitAll()
-
+                .antMatchers("/api/**").permitAll()
                 /* 그 외 어떤 요청이든 '인증'*/
-                .anyRequest().permitAll();
+                .anyRequest().authenticated();
 
 
 // [로그인 기능]
@@ -104,7 +118,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        //configuration.addAllowedOrigin("http://localhost:3000"); // local 테스트 시
+
         configuration.addAllowedMethod(HttpMethod.GET.name());
         configuration.addAllowedMethod(HttpMethod.HEAD.name());
         configuration.addAllowedMethod(HttpMethod.POST.name());
@@ -112,13 +126,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.addAllowedMethod(HttpMethod.DELETE.name());
         configuration.addAllowedHeader("*");
         configuration.addExposedHeader("Authorization");
-        configuration.addAllowedOriginPattern("http://localhost:3000"); // 배포 전 모두 허용
+//        configuration.addExposedHeader("refreshToken");
+//        configuration.addAllowedOriginPattern("http://localhost:3000"); // local 테스트 시
+        configuration.addAllowedOriginPattern("http://doridori.shop.s3-website.ap-northeast-2.amazonaws.com"); // 배포 전 모두 허용
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+
 
     @Bean
     public AuthenticationSuccessHandler successHandler(){
@@ -130,5 +148,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new RestLoginFailureHandler();
     }
 
-    
+
 }
