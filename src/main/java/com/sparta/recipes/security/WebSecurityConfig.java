@@ -16,6 +16,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.session.MapSession;
+import org.springframework.session.MapSessionRepository;
+import org.springframework.session.SessionRepository;
+import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
 import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 import org.springframework.web.cors.CorsConfiguration;
@@ -23,18 +27,34 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.concurrent.ConcurrentHashMap;
+
+@EnableSpringHttpSession
 @Configuration
 @EnableWebSecurity // 스프링 Security 지원을 가능하게 함
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+
+
+    /*SessionRepository<MapSession> 저장소 빈을 제공*/
+    @Bean
+    MapSessionRepository sessionRepository() {
+        return new MapSessionRepository(new ConcurrentHashMap<>());
+    }
+
+
+    //세션쿠키 커스텀
     @Bean
     public CookieSerializer cookieSerializer() {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
-        serializer.setUseSecureCookie(true);
         serializer.setCookieName("TOUGHCOOKIE");
-        serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$");
-        serializer.setSameSite("None");
+        serializer.setCookiePath("/");
+//        serializer.setDomainName("doridori.shop");
+        serializer.setUseHttpOnlyCookie(false);
+//        serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$");
+        serializer.setSameSite("");
+//        serializer.setUseSecureCookie(true);
         return serializer;
     }
 
@@ -68,6 +88,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             http
 //                    .httpBasic().disable()
                 .cors().configurationSource(corsConfigurationSource()); //cors 활성화
+            http.headers().frameOptions().sameOrigin();
+
 
 
 
@@ -82,7 +104,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/**").permitAll()
                 .antMatchers("/api/**").permitAll()
                 /* 그 외 어떤 요청이든 '인증'*/
-                .anyRequest().authenticated();
+                .anyRequest().permitAll();
 
 
 // [로그인 기능]
@@ -96,6 +118,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .logoutUrl("/user/logout")
 //                        .deleteCookies("JSESSIONID")
                         .logoutSuccessHandler(restLogoutSuccessHandler)
+                        .deleteCookies()
                         .permitAll();
                 http.exceptionHandling();
     }
@@ -127,8 +150,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.addAllowedHeader("*");
         configuration.addExposedHeader("Authorization");
 //        configuration.addExposedHeader("refreshToken");
-//        configuration.addAllowedOriginPattern("http://localhost:3000"); // local 테스트 시
-        configuration.addAllowedOriginPattern("http://doridori.shop.s3-website.ap-northeast-2.amazonaws.com"); // 배포 전 모두 허용
+        configuration.addAllowedOriginPattern("http://localhost:3000"); // local 테스트 시
+//        configuration.addAllowedOriginPattern("http://doridori.shop"); // 배포 전 모두 허용
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
